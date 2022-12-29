@@ -33,9 +33,9 @@ checkmounts() {
 mountpoints=($(awk '$1 !~ /^#/ && $2 ~ /^[/]/ {print $2}' /etc/fstab))
 for mount in "${mountpoints[@]}"; do
    if ! findmnt "$mount" &> /dev/null; then
-      printf "%s is declared in fstab but not mounted" "$mount"
+      printf "%s is declared in fstab but not mounted\n" "$mount"
    else
-      printf "$mount is mounted properly" "$mount"
+      printf "$mount is mounted properly\n" "$mount"
    fi
 done
 }

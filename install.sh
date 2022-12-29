@@ -17,4 +17,4 @@ else
 fi
 }
 
-install .local/ .vim/ .bashrc .bash_profile .vimrc
+install ".local" ".vim" ".bashrc" ".bash_profile" ".vimrc"

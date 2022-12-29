@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+[[ -f $HOME/.local/colors ]] && . "$HOME/.local/colors"
+
+printf "Enter target IP: "
+
+read -er target_host
+
+push() {
+    PRINT "green" "$target_host"
+    rsync -av "$@" "$target_host":${HOME}/
+}
+
+push ${HOME}/.bashrc ${HOME}/.bash_profile ${HOME}/.vimrc ${HOME}/.local 2> /dev/null

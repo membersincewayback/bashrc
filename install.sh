@@ -8,7 +8,6 @@ install() {
     if [[ "${proceed,,}" == "y" ]]; then
 
         rsync -av "$@" ${HOME}/
-        . ${HOME}/.bashrc
 
     else
         printf "No action taken.\n"

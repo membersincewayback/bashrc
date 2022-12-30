@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
 
-if [[ -f ${HOME}/.local/colors ]]; then
-    source "${HOME}/.local/colors"
-fi
+[[ -f ${HOME}/.local/colors ]] && . "${HOME}/.local/colors"
 
 today=$(date +%A)
 
 printf "\t   "
-printf "${blink}${bold}${green}IT'S TACO ${today^^}!!!${reset}"
+printf "%b%b%bIT'S TACO %s!!!%b" ${blink} ${bold} ${green} ${today^^} ${reset}
 
-PRINT yellow "
+printf "%b
 ⠀⠀⠀⠀⠀⠀⣤⠀⠀⣤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⢠⡄⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠰⣦⠀⠙⣇⠀⠈⠀⠈⠁⠀⠀⠀⠀⠀⠀⠀⣀⠀⠀⠀⢀⣤⠀⠀⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⠈⠀⠀⠟⠁⠀⡴⠋⠀⠀⠀⠀
 ⠀⠀⠀⠀⠈⢧⠀⠈⠀⠀⠀⠀⠀⠀⢰⠶⢄⡀⠀⡜⠀⠓⢄⡠⠋⠀⢣⣀⡤⠒⠉⢡⠀⠀⠀⣀⡀⠀⠀⠀⠀⠀⠀⠈⠀⢀⡴⠋⠀⠀
@@ -35,6 +33,7 @@ PRINT yellow "
 ⠀⠀⠀⣠⠖⠀⠀⡀⠀⠀⠀⠈⠁⠀⠀⠀⢳⠀⡠⠚⠉⢆⠀⢀⠜⠑⢄⠀⠀⡞⠈⠱⠾⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡀⠈⢦⡀⠀⠀⠀
 ⠀⠀⠈⠁⠀⣠⠎⠀⢀⡼⠁⢀⠀⠀⠀⠀⠘⠋⠀⠀⠀⠈⠷⠃⠀⠀⠀⠳⡼⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠀⢢⡀⠈⢷⡀⠈⠗⠀⠀⠀
 ⠀⠀⠀⠀⠈⠁⠀⠀⡻⠁⠀⠛⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠈⠃⠀⠈⠁⠀⠀⠀⠀⠀
-"
+" ${yellow}
+
 printf "\t   "
-printf "${blink}${bold}${green}LET'S ALL GO GET TACOS!!!${reset}\n"
+printf "%b%b%bLET'S ALL GO GET TACOS!!!%b\n" ${blink} ${bold} ${green} ${reset}

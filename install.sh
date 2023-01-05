@@ -1,18 +1,16 @@
 #!/usr/bin/env bash
 
-install() {
-    printf "Installation will overwrite .bashrc, .bash_profile, and .vimrc. Proceed? [y/N]\n"
+files=( ".local" ".vim" ".bashrc" ".bash_profile" ".vimrc" )
 
-    read -er proceed
+install() {
+    read -erp "Overwrite .bashrc, .bash_profile, and .vimrc? [y/N]: " proceed
 
     if [[ "${proceed,,}" == "y" ]]; then
-
-        rsync -av "$@" ${HOME}/
-
+        rsync -av "${files[@]}" "${HOME}"/
     else
         printf "No action taken.\n"
         exit 0
     fi
 }
 
-install ".local" ".vim" ".bashrc" ".bash_profile" ".vimrc"
+install

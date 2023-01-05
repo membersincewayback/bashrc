@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-[[ -f $HOME/.local/colors ]] && . "$HOME/.local/colors"
+files=( "$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.vimrc" "$HOME/.local" )
 
-printf "Enter target IP: "
+[[ -f "$HOME/.local/colors" ]] && . "$HOME/.local/colors"
 
-read -er target_host
+read -erp "Enter target IP: " host
 
 push() {
-    PRINT "green" "$target_host"
-    rsync -av "$@" "$target_host":${HOME}/
+    PRINT "green" "$host"
+    rsync -av "${files[@]}" "$host":"$HOME"/
 }
 
-push ${HOME}/.bashrc ${HOME}/.bash_profile ${HOME}/.vimrc ${HOME}/.local 2> /dev/null
+push

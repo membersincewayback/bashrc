@@ -32,9 +32,9 @@ extract() {
 checkmounts() {
     while IFS="" read -r mount; do
         if ! findmnt "$mount" &> /dev/null; then
-            printf "%s is declared in fstab but not mounted\n" "$mount"
+            printf "\033[38;5;160m%s is declared in fstab but not mounted\n\033[0m" "$mount"
         else
             printf "%s is mounted properly\n" "$mount"
         fi
-    done < <(awk '$1 !~ /^#/ && $2 ~ /^[/]/ {print $2}' /etc/fstab)
+    done < <(awk '$1!~/^#/ && $2~/^[/]/ {print $2}' /etc/fstab)
 }

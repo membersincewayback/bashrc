@@ -8,7 +8,6 @@ under='\033[4m'
 blink='\033[5m'
 reverse='\033[7m'
 invisible='\033[8m'
-black='\x1b[30m'
 red='\033[38;5;160m'
 green='\033[38;5;119m'
 yellow='\033[38;5;226m'
@@ -28,31 +27,31 @@ bg_cyan='\x1b[46m'
 bg_white='\x1b[47m'
 
 PRINT() {
-    case $1 in
-        bold)           color=$bold         ;;
-        dim)            color=$dim          ;;
-        italic)         color=$italic       ;;
-        under)          color=$under        ;;
-        blink)          color=$blink        ;;
-        reverse)        color=$reverse      ;;
-        invisible)      color=$invisible    ;;
-        red)            color=$red          ;;
-        green)          color=$green        ;;
-        yellow)         color=$yellow       ;;
-        blue)           color=$blue         ;;
-        magenta)        color=$magenta      ;;
-        cyan)           color=$cyan         ;;
-        grey)           color=$grey         ;;
-        purple)         color=$purple       ;;
-        white)          color=$white        ;;
-        bg_black)       color=$bg_black     ;;
-        bg_red)         color=$bg_red       ;;
-        bg_green)       color=$bg_green     ;;
-        bg_yellow)      color=$bg_yellow    ;;
-        bg_blue)        color=$bg_blue      ;;
-        bg_magenta)     color=$bg_magenta   ;;
-        bg_cyan)        color=$bg_cyan      ;;
-        bg_white)       color=$bg_white     ;;
+    case "$1" in
+        bold)           color="$bold"       ;;
+        dim)            color="$dim"        ;;
+        italic)         color="$italic"     ;;
+        under)          color="$under"      ;;
+        blink)          color="$blink"      ;;
+        reverse)        color="$reverse"    ;;
+        invisible)      color="$invisible"  ;;
+        red)            color="$red"        ;;
+        green)          color="$green"      ;;
+        yellow)         color="$yellow"     ;;
+        blue)           color="$blue"       ;;
+        magenta)        color="$magenta"    ;;
+        cyan)           color="$cyan"       ;;
+        grey)           color="$grey"       ;;
+        purple)         color="$purple"     ;;
+        white)          color="$white"      ;;
+        bg_black)       color="$bg_black"   ;;
+        bg_red)         color="$bg_red"     ;;
+        bg_green)       color="$bg_green"   ;;
+        bg_yellow)      color="$bg_yellow"  ;;
+        bg_blue)        color="$bg_blue"    ;;
+        bg_magenta)     color="$bg_magenta" ;;
+        bg_cyan)        color="$bg_cyan"    ;;
+        bg_white)       color="$bg_white"   ;;
     esac
         printf "${color}%s${reset}\n" "$2"
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-files=( "$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.vimrc" "$HOME/.local" )
+files=( "$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.vimrc" "$HOME/.local" "$HOME/.vim" )
 
 [[ -f "$HOME/.local/colors" ]] && . "$HOME/.local/colors"
 

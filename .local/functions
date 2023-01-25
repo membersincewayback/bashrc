@@ -36,5 +36,5 @@ checkmounts() {
         else
             printf "%s is mounted properly\n" "$mount"
         fi
-    done < <(awk '$1!~/^#/ && $2~/^[/]/ {print $2}' /etc/fstab)
+    done < <(awk '!/^#/ && $2~/^\// {print $2}' /etc/fstab)
 }

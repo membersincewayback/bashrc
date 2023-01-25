@@ -23,8 +23,6 @@ nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 nnoremap S :%s//gc<Left><Left><Left>
 nnoremap F :Vex<CR>
-nnoremap zz <Esc>:wq<CR>
-nnoremap ZZ <Esc>:wqa<CR>
 inoremap jj <Esc>
 
 augroup WhiteSpace
@@ -40,9 +38,7 @@ if !has('gui_running')
   set t_Co=256
 endif
 
-let g:lightline = {
-  \ 'colorscheme': 'onedark',
-  \ }
+let g:lightline = { 'colorscheme': 'onedark' }
 
 if (has("autocmd") && !has("gui_running"))
   augroup colorset

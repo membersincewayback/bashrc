@@ -25,4 +25,4 @@ export LESSHISTFILE="/dev/null"
 
 [[ -f $HOME/.local/functions ]] && . "$HOME/.local/functions"
 
-PS1="${grey}\u${green} | ${grey}\h${green} | ${purple}\w${green}\n$ ${reset}"
+PS1="\e[${grey}\u${green} | ${grey}\h${green} | ${purple}\w${green}\n$ \[${reset}"

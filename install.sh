@@ -6,7 +6,7 @@ install() {
     read -erp "Overwrite .bashrc, .bash_profile, and .vimrc? [y/N]: " proceed
 
     if [[ "${proceed,,}" == "y" ]]; then
-        rsync -av "${files[@]}" "${HOME}"/
+        rsync -avc "${files[@]}" "${HOME}"/
     else
         printf "No action taken.\n"
         exit 0

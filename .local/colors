@@ -16,6 +16,7 @@ magenta='\033[38;5;207m'
 cyan='\033[38;5;51m'
 grey='\033[38;5;251m'
 purple='\033[38;5;129m'
+orange='\033[38;5;202m'
 white='\x1b[37m'
 bg_black='\x1b[40m'
 bg_red='\x1b[41m'
@@ -44,6 +45,7 @@ PRINT() {
         grey) color="$grey" ;;
         purple) color="$purple" ;;
         white) color="$white" ;;
+        orange) color="$orange" ;;
         bg_black) color="$bg_black" ;;
         bg_red) color="$bg_red" ;;
         bg_green) color="$bg_green" ;;

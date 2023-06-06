@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+
+# Health: A command-line Red Hat system health check tool written in bash 3.2+.
+# https://github.com/zpiatt/health
+#
+# Copyright (C) 2023 Zac Piatt
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+version="Health version: 1.2.4 - May 23, 2023"
+
+usage() {
+	cat <<-EOF
+	Usage: health [OPTION]... [DIRECTORY]...
+
+	  -d,	display colorized file system disk space usage
+	  -i,	display colorized file systems inodes usage
+	  -s,	search for common file permission vulnerabilities
+	  -f,	report 10 largest files in directory tree
+	  -m,	compare mounts to /etc/fstab
+	  -z,	display zombie process count, if any
+	  -r,	display health on remote host
+	  -e,	parse dmesg for alerts, errors, etc.
+	  -v,	display version number and exit
+	  -h,	display this help and exit
+
+	Full documentation <https://github.com/zpiatt/health>
+	${version}
+	EOF
+	return
+}
+
+health() {
+	printf "%bHostname:%b " "$blue" "$reset"; hostname -f
+	printf "%bServer Type:%b %s, %s\n" "$blue" "$reset"\
+		"$(< /sys/devices/virtual/dmi/id/product_name)" "$(< /sys/devices/virtual/dmi/id/sys_vendor)"
+	printf "%bRHEL Version:%b %s\n" "$blue" "$reset" "$(< /etc/redhat-release)"
+	printf "%bKernel Version:%b " "$blue" "$reset"; uname -r
+	printf "%bUptime:%b " "$blue" "$reset"; uptime
+	printf "%bUsers Currently Logged in:%b\n" "$blue" "$reset"; who -u
+	printf "%bMemory Usage:%b\n" "$blue" "$reset"; free -h
+	printf "%bTop 5 Processes by Memory:%b\n" "$blue" "$reset"; ps -eo %mem,comm,pid --sort=-%mem | head -n 6
+	printf "%bTop 5 Processes by CPU:%b\n" "$blue" "$reset"; ps -eo pcpu,comm,pid --sort=-pcpu | head -n 6
+	printf "%bMounts:%b\n" "$blue" "$reset"
+	if ! timeout 1 df &> /dev/null; then printf "%bHung mount detected.%b\n" "$yellow" "$reset"; return; fi
+	while IFS= read -r mount; do
+		if ! findmnt "$mount" &> /dev/null; then
+			printf "%b%s is declared in fstab but not mounted\n%b" "$yellow" "$mount" "$reset"
+			error=true
+		fi
+	done < <(awk '$1!~/^#/ && $2~/^[/]/{print $2}' /etc/fstab)
+	[[ -z "$error" ]] && printf "No issues detected\n"
+	printf "%bFull File Systems:%b\n%s\n" "$blue" "$reset" "$(df -h | grep "100%" || printf "None\n")"
+	printf "%bFull Inodes:%b\n%s\n" "$blue" "$reset" "$(df -i | grep "100%" || printf "None\n")"
+}
+
+get_args() {
+	while getopts ':hvr:dislfmze' option; do
+		case "$option" in
+			h) usage; exit 0 ;;
+			v) printf "%s\n" "$version"; exit 0 ;;
+			r) ssh -qt "$OPTARG" "/usr/bin/health" ;;
+			d)
+				if ! timeout 1 df &> /dev/null; then printf "%bHung mount detected.%b\n" "$yellow" "$reset"; return; fi
+				printf "%bDisk Space Usage:%b\n" "$blue" "$reset"
+				while IFS= read -r line; do
+					case "$line" in
+						*100%*) printf "%b%s%b\n" "$red" "$line" "$reset" ;;
+						*9?%*) printf "%b%s%b\n" "$yellow" "$line" "$reset" ;;
+						*) printf "%s\n" "$line" ;;
+					esac
+				done < <(if ! df -Th "$dir" 2> /dev/null; then df -Th; fi)
+			;;
+
+			i)
+				if ! timeout 1 df &> /dev/null; then printf "%bHung mount detected.%b\n" "$yellow" "$reset"; return; fi
+				printf "%bInode Usage:%b\n" "$blue" "$reset"
+				while IFS= read -r line; do
+					case "$line" in
+						*100%*) printf "%b%s%b\n" "$red" "$line" "$reset" ;;
+						*9?%*) printf "%b%s%b\n" "$yellow" "$line" "$reset" ;;
+						*) printf "%s\n" "$line" ;;
+					esac
+				done < <(if ! df -i "$dir" 2> /dev/null; then df -i; fi)
+			;;
+
+			s)
+				[[ -n $(find "${dir:-.}" ! -type l -perm -002) ]] &&\
+					printf "%bWorld writable files:%b\n" "$blue" "$reset"; find "${dir:-.}" ! -type l -perm -002
+				[[ -n $(find "${dir:-.}" -perm -4000) ]] &&\
+					printf "%bFiles with setuids:%b\n" "$blue" "$reset"; find "${dir:-.}" -perm -4000
+				[[ -n $(find "${dir:-.}" -perm -2000) ]] &&\
+					printf "%bFiles with setguids:%b\n" "$blue" "$reset"; find "${dir:-.}" -perm -2000
+			;;
+
+			f)
+				printf "%b10 Largest Files in Directory Tree:%b\n" "$blue" "$reset"
+				find "${dir:-.}" -type f -exec du -Sh {} + | sort -rn | head
+			;;
+
+			m)
+				while IFS= read -r mount; do
+					if ! findmnt "$mount" &> /dev/null; then
+						printf "%b%s is declared in fstab but not mounted\n%b" "$red" "$mount" "$reset"
+					else
+						printf "%s is mounted properly\n" "$mount"
+					fi
+				done < <(awk '$1!~/^#/ && $2~/^[/]/{print $2}' /etc/fstab)
+			;;
+
+			z)
+				printf "%bZombie Process Count: %b" "$blue" "$reset"
+				ps axo stat | awk 'BEGIN{i=0}/Z/{i++;}END{print i}'
+			;;
+
+			e)
+				if [[ -n $(dmesg -l emerg,crit,alert,err,warn 2> /dev/null) ]]; then
+					printf "%bdmesg:%b\n" "$blue" "$reset"
+				[[ -n $(dmesg -l emerg) ]] && \
+					printf "%bemergency messages%b: %d\n" "$red" "$reset" "$(dmesg -l emerg | wc -l)"
+				[[ -n $(dmesg -l alert) ]] && \
+					printf "%balert messages%b: %d\n" "$red" "$reset" "$(dmesg -l alert | wc -l)"
+				[[ -n $(dmesg -l crit) ]] && \
+					printf "%bcritical messages%b: %d\n" "$orange" "$reset" "$(dmesg -l crit | wc -l)"
+				[[ -n $(dmesg -l err) ]] && \
+					printf "%berror messages%b: %d\n" "$yellow" "$reset" "$(dmesg -l err | wc -l)"
+				[[ -n $(dmesg -l warn) ]] && \
+					printf "%bwarning messages%b: %d\n" "$yellow" "$reset" "$(dmesg -l warn | wc -l)"
+				fi
+			;;
+
+			?)
+				printf "health: invalid option -- '%s'\n" "$OPTARG"
+				printf "Try 'health -h' for more information.\n"; exit 1
+			;;
+		esac
+	done
+}
+
+main() {
+	green='\033[38;5;119m'
+	yellow='\033[38;5;226m'
+	blue='\033[38;5;33m'
+	red='\033[38;5;160m'
+	orange='\033[38;5;202m'
+	reset='\033[0m'
+	if [[ "$#" -ge 1 ]]; then
+		for dir in "$@"; do :; done
+		[[ ! -d "$dir" ]] && unset dir
+		get_args "$@"
+	else
+		health
+	fi
+}
+
+main "$@"

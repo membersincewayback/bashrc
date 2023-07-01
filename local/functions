@@ -18,7 +18,7 @@ clean_history() {
 
 	if [[ -f "$hist" ]]; then
 		tac "$hist" | awk '{$1=$1}1 && !x[$0]++' | tac > "$hist_tmp"
-		\mv "$hist_tmp" "$hist"
+		mv -f "$hist_tmp" "$hist"
 	fi
 }
 
@@ -40,9 +40,9 @@ extract() {
 }
 
 checkmounts() {
-    while IFS="" read -r mount; do
+    while IFS= read -r mount; do
         if ! findmnt "$mount" &> /dev/null; then
-            printf "\033[38;5;160m%s is declared in fstab but not mounted\n\033[0m" "$mount"
+            printf "\033[31m%s is declared in fstab but not mounted\n\033[0m" "$mount"
         else
             printf "%s is mounted properly\n" "$mount"
         fi

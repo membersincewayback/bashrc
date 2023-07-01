@@ -19,6 +19,7 @@ BACKUP_VIM_DIR := $(BACKUP_DIR)/.vim
 install:
 	@mkdir -p $(HOME)/.local
 	@mkdir -p $(HOME)/.vim
+	@mkdir -p $(BACKUP_DIR)
 
 	@$(if $(wildcard $(LOCAL_DIR)), mkdir -p $(BACKUP_LOCAL_DIR))
 	@$(if $(wildcard $(VIM_DIR)), mkdir -p $(BACKUP_VIM_DIR))

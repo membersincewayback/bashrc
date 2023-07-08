@@ -2,13 +2,14 @@
 My Bash/Vim profile. I make no guarantee this will work for you.
 
 I am currently using this on:
-- Fedora 38 Workstation
-- Fedora 38 Server
-- Red Hat Enterprise 6/7/8
-- Ubuntu 22.10 Desktop
+- Debian 12
+- OpenBSD 7.3
+- Ubuntu 23.04 Desktop
 - Ubuntu 22.04 Server
 - Raspberry Pi OS Lite (bullseye)
 
+I recently completed a migration of my homelab away from RHEL products.
+My Github reflects my hobby, and that hobby is FOSS.
 
 ### More:
 My Vim colorscheme:

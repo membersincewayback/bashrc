@@ -13,12 +13,12 @@ dirs -v
 }
 
 clean_history() {
+	local hist hist_tmp
 	local hist="${HOME}/.bash_history"
-	local hist_tmp="${HOME}/.hist.tmp"
 
 	if [[ -f "$hist" ]]; then
-		tac "$hist" | awk '{$1=$1}1 && !x[$0]++' | tac > "$hist_tmp"
-		mv -f "$hist_tmp" "$hist"
+		hist_tmp="$(tac "$hist" | awk '{$1=$1}1 && !x[$0]++' | tac )"
+		echo "$hist_tmp" > "$hist"
 	fi
 }
 
@@ -47,4 +47,14 @@ checkmounts() {
             printf "%s is mounted properly\n" "$mount"
         fi
     done < <(awk '!/^#/ && $2~/^[/]/ {print $2}' /etc/fstab)
+}
+
+checkfs() {
+	timeout 2 df &> /dev/null || { printf "Hung mount detected.\n"; return; }
+	while IFS= read -r mount; do
+		findmnt "$mount" &> /dev/null || {
+		printf "%s is declared in fstab but not mounted\n" "$mount"; }
+	done < <(awk '$1!~/^#/ && $2~/^[/]/{print $2}' /etc/fstab)
+	printf "Full File Systems:\n%s\n" "$(df -h | grep "100%" || printf "None\n")"
+	printf "Full Inodes:\n%s\n" "$(df -i | grep "100%" || printf "None\n")"
 }

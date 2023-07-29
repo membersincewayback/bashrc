@@ -25,6 +25,9 @@ nnoremap S :%s//gc<Left><Left><Left>
 nnoremap F :Vex<CR>
 inoremap jj <Esc>
 
+nnoremap <silent> ,<space> :<c-u>put!=repeat([''],v:count)<bar>']+1<cr>
+nnoremap <silent> .<space> :<c-u>put =repeat([''],v:count)<bar>'[-1<cr>
+
 augroup WhiteSpace
     autocmd!
     autocmd BufWritePre * %s/\s\+$//e

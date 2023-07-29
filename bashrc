@@ -28,6 +28,4 @@ export LESSHISTFILE="/dev/null"
 
 [[ "$PATH" != *${HOME}/.local/bin:* ]] && export PATH="${HOME}/.local/bin:${PATH}"
 
-[[ $(last $USER | awk 'NR==2{print $6}') != $(date +%-d) ]] && health
-
 PS1="\e[${grey}\u${green} | ${grey}\h${green} | ${purple}\w${green}\n$ \[${reset}"

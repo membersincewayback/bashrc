@@ -1,8 +1,10 @@
 syntax on
-set tabstop=4
 set smartindent
-set softtabstop=4
 set shiftwidth=4
+set smarttab
+set expandtab
+set tabstop=8
+set softtabstop=0
 set ignorecase
 set smartcase
 set incsearch
@@ -24,7 +26,6 @@ nnoremap <C-H> <C-W><C-H>
 nnoremap S :%s//gc<Left><Left><Left>
 nnoremap F :Vex<CR>
 inoremap jj <Esc>
-
 nnoremap <silent> ,<space> :<c-u>put!=repeat([''],v:count)<bar>']+1<cr>
 nnoremap <silent> .<space> :<c-u>put =repeat([''],v:count)<bar>'[-1<cr>
 

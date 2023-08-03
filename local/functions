@@ -1,25 +1,41 @@
 #!/usr/bin/env bash
 
 pd() {
-{    case "$1" in
+    { case "$1" in
         -[0-9]) popd +"${1//[!0-9]/}" || return ;;
         +[0-9]) pushd "$1" || return ;;
         -c) dirs -c ;;
         -) popd || return ;;
         *) pushd "$@" || return ;;
     esac
-} > /dev/null
-dirs -v
+    } > /dev/null
+    dirs -v
+}
+
+killbg() {
+    local pid_array pid confirm
+    while IFS= read -r pid; do pid_array+=("$pid"); done < <(jobs -l | awk '{print $2}')
+    [[ -z "${pid_array[*]}" ]] && { printf "No jobs found.\n"; return 1; }
+    case "${1:-}" in
+        -y) for pid in "${pid_array[@]}"; do kill -9 "$pid"; done ;;
+        *)
+            jobs -l
+            read -erp "Kill: ${pid_array[*]}? [y/n]: " confirm
+            [[ ! "${confirm,,}" =~ ^y(es)?$ ]] && return 0
+            for pid in "${pid_array[@]}"; do kill -9 "$pid"; done
+        ;;
+    esac
+    sleep 1; jobs
 }
 
 clean_history() {
-	local hist hist_tmp
-	local hist="${HOME}/.bash_history"
+    local hist hist_tmp
+    hist="${HOME}/.bash_history"
 
-	if [[ -f "$hist" ]]; then
-		hist_tmp="$(tac "$hist" | awk '{$1=$1}1 && !x[$0]++' | tac )"
-		echo "$hist_tmp" > "$hist"
-	fi
+    if [[ -f "$hist" ]]; then
+        hist_tmp="$(tac "$hist" | awk '{$1=$1}1 && !x[$0]++' | tac )"
+        echo "$hist_tmp" > "$hist"
+    fi
 }
 
 extract() {
@@ -50,11 +66,11 @@ checkmounts() {
 }
 
 checkfs() {
-	timeout 2 df &> /dev/null || { printf "Hung mount detected.\n"; return; }
-	while IFS= read -r mount; do
-		findmnt "$mount" &> /dev/null || {
-		printf "%s is declared in fstab but not mounted\n" "$mount"; }
-	done < <(awk '$1!~/^#/ && $2~/^[/]/{print $2}' /etc/fstab)
-	printf "Full File Systems:\n%s\n" "$(df -h | grep "100%" || printf "None\n")"
-	printf "Full Inodes:\n%s\n" "$(df -i | grep "100%" || printf "None\n")"
+    timeout 2 df &> /dev/null || { printf "Hung mount detected.\n"; return; }
+    while IFS= read -r mount; do
+        findmnt "$mount" &> /dev/null || {
+        printf "%s is declared in fstab but not mounted\n" "$mount"; }
+    done < <(awk '$1!~/^#/ && $2~/^[/]/{print $2}' /etc/fstab)
+    printf "Full File Systems:\n%s\n" "$(df -h | grep "100%" || printf "None\n")"
+    printf "Full Inodes:\n%s\n" "$(df -i | grep "100%" || printf "None\n")"
 }

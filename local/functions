@@ -16,14 +16,15 @@ killbg() {
     local array pid confirm
     readarray -t array < <( jobs -p )
     [[ -z "${array[*]}" ]] && { printf "killbg: no such job\n" >&2; return 1; }
-    case "$1" in
-        -y) for pid in "${array[@]}"; do kill -9 "$pid"; done ;;
-        *)
+    case "${1:-confirm}" in
+        confirm)
             jobs -l
             read -erp "Kill: ${array[*]}? [y/n]: " confirm
             [[ ! "${confirm,,}" =~ ^y(es)?$ ]] && return 0
-            for pid in "${array[@]}"; do kill -9 "$pid"; done
+            for pid in "${array[@]}"; do kill -15 "$pid"; done
         ;;
+
+        *) for pid in "${array[@]}"; do kill "$1" "$pid"; done ;;
     esac
     sleep .1; jobs
 }

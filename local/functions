@@ -2,30 +2,30 @@
 
 pd() {
     { case "$1" in
-        -[0-9]) popd +"${1//[!0-9]/}" || return ;;
-        +[0-9]) pushd "$1" || return ;;
+        +[0-9]) pushd "$1" || return 1 ;;
+        -[0-9]) popd +"${1//[!0-9]/}" || return 1 ;;
+        -) popd || return 1 ;;
         -c) dirs -c ;;
-        -) popd || return ;;
-        *) pushd "$@" || return ;;
+        *) pushd "$@" || return 1 ;;
     esac
     } > /dev/null
     dirs -v
 }
 
 killbg() {
-    local pid_array pid confirm
-    while IFS= read -r pid; do pid_array+=("$pid"); done < <(jobs -l | awk '{print $2}')
-    [[ -z "${pid_array[*]}" ]] && { printf "No jobs found.\n"; return 1; }
-    case "${1:-}" in
-        -y) for pid in "${pid_array[@]}"; do kill -9 "$pid"; done ;;
+    local array pid confirm
+    readarray -t array < <( jobs -p )
+    [[ -z "${array[*]}" ]] && { printf "killbg: no such job\n" >&2; return 1; }
+    case "$1" in
+        -y) for pid in "${array[@]}"; do kill -9 "$pid"; done ;;
         *)
             jobs -l
-            read -erp "Kill: ${pid_array[*]}? [y/n]: " confirm
+            read -erp "Kill: ${array[*]}? [y/n]: " confirm
             [[ ! "${confirm,,}" =~ ^y(es)?$ ]] && return 0
-            for pid in "${pid_array[@]}"; do kill -9 "$pid"; done
+            for pid in "${array[@]}"; do kill -9 "$pid"; done
         ;;
     esac
-    sleep 1; jobs
+    sleep .1; jobs
 }
 
 clean_history() {
@@ -51,14 +51,14 @@ extract() {
         *.zip) unzip "$1" ;;
         *.Z) uncompress "$1" ;;
         *.7z) 7z x "$1" ;;
-        *) printf "%s cannot be extracted" "$1" ;;
+        *) printf "%s cannot be extracted" "$1" >&2; return 1 ;;
     esac
 }
 
 checkmounts() {
     while IFS= read -r mount; do
         if ! findmnt "$mount" &> /dev/null; then
-            printf "\033[31m%s is declared in fstab but not mounted\n\033[0m" "$mount"
+            printf "\033[31m%s is declared in fstab but not mounted\n\033[0m" "$mount" >&2
         else
             printf "%s is mounted properly\n" "$mount"
         fi
@@ -66,10 +66,10 @@ checkmounts() {
 }
 
 checkfs() {
-    timeout 2 df &> /dev/null || { printf "Hung mount detected.\n"; return; }
+    timeout 2 df &> /dev/null || { printf "Hung mount detected.\n" >&2; return 1; }
     while IFS= read -r mount; do
         findmnt "$mount" &> /dev/null || {
-        printf "%s is declared in fstab but not mounted\n" "$mount"; }
+        printf "%s is declared in fstab but not mounted\n" "$mount" >&2; }
     done < <(awk '$1!~/^#/ && $2~/^[/]/{print $2}' /etc/fstab)
     printf "Full File Systems:\n%s\n" "$(df -h | grep "100%" || printf "None\n")"
     printf "Full Inodes:\n%s\n" "$(df -i | grep "100%" || printf "None\n")"

@@ -28,5 +28,6 @@ export VISUAL="/usr/bin/vim"
 export EDITOR="$VISUAL"
 export PAGER="/usr/bin/less"
 export LESSHISTFILE="/dev/null"
+export PYTHONDONTWRITEBYTECODE=1
 
 PS1="\e[${grey}\u${green} | ${grey}\h${green} | ${purple}\w${green}\n$ \[${reset}"

@@ -75,3 +75,12 @@ checkfs() {
     printf "Full File Systems:\n%s\n" "$(df -h | grep "100%" || printf "None\n")"
     printf "Full Inodes:\n%s\n" "$(df -i | grep "100%" || printf "None\n")"
 }
+
+thetime() {
+    local zulu central
+
+    zulu="$( date -u +"%a %b %-d, %Y - %R:%S" )"
+    central="$( TZ="America/Chicago" date +"%a %b %-d, %Y - %R:%S" )"
+
+    printf "CDT: %s\nUTC: %s\n" "$central" "$zulu"
+}

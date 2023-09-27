@@ -25,8 +25,6 @@ nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 nnoremap S :%s//gc<Left><Left><Left>
-nnoremap F :Lex<cr>
-inoremap F :Lex<cr>
 inoremap jj <Esc>
 nnoremap <silent> ,<space> :<c-u>put!=repeat([''],v:count)<bar>']+1<cr>
 nnoremap <silent> .<space> :<c-u>put =repeat([''],v:count)<bar>'[-1<cr>
@@ -36,10 +34,12 @@ augroup WhiteSpace
     autocmd BufWritePre * %s/\s\+$//e
 augroup END
 
+nnoremap F :tabe .<cr>
+nnoremap T :tabN<cr>
 let g:netrw_banner = 0
 let g:netrw_liststyle = 3
-let g:netrw_winsize = 20
 let g:netrw_dirhistmax = 0
+let g:netrw_split_browse = 3
 
 if !has('gui_running')
   set t_Co=256

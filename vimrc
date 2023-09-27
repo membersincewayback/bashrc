@@ -18,13 +18,15 @@ set scrolloff=8
 set wildmode=longest,list,full
 set colorcolumn=100
 set noshowmode
+set belloff=all
 
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 nnoremap S :%s//gc<Left><Left><Left>
-nnoremap F :Vex<CR>
+nnoremap F :Lex<cr>
+inoremap F :Lex<cr>
 inoremap jj <Esc>
 nnoremap <silent> ,<space> :<c-u>put!=repeat([''],v:count)<bar>']+1<cr>
 nnoremap <silent> .<space> :<c-u>put =repeat([''],v:count)<bar>'[-1<cr>
@@ -36,6 +38,7 @@ augroup END
 
 let g:netrw_banner = 0
 let g:netrw_liststyle = 3
+let g:netrw_winsize = 20
 let g:netrw_dirhistmax = 0
 
 if !has('gui_running')

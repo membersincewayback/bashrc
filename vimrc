@@ -26,8 +26,8 @@ nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 nnoremap S :%s//gc<Left><Left><Left>
 inoremap jj <Esc>
-nnoremap <silent> ,<space> :<c-u>put!=repeat([''],v:count)<bar>']+1<cr>
-nnoremap <silent> .<space> :<c-u>put =repeat([''],v:count)<bar>'[-1<cr>
+nnoremap ,<space> :put! _<cr>
+nnoremap .<space> :put _<cr>
 
 augroup WhiteSpace
     autocmd!
@@ -35,7 +35,8 @@ augroup WhiteSpace
 augroup END
 
 nnoremap F :tabe .<cr>
-nnoremap T :tabN<cr>
+nnoremap t :tabnext<cr>
+nnoremap T :tabprev<cr>
 let g:netrw_banner = 0
 let g:netrw_liststyle = 3
 let g:netrw_dirhistmax = 0

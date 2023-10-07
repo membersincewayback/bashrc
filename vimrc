@@ -18,7 +18,7 @@ set scrolloff=8
 set wildmode=longest,list,full
 set colorcolumn=100
 set noshowmode
-set belloff=all
+if version >= 703 | set belloff=all | endif
 
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
@@ -28,13 +28,8 @@ nnoremap S :%s//gc<Left><Left><Left>
 inoremap jj <Esc>
 nnoremap ,<space> :put! _<cr>
 nnoremap .<space> :put _<cr>
-
-augroup WhiteSpace
-    autocmd!
-    autocmd BufWritePre * %s/\s\+$//e
-augroup END
-
-nnoremap F :tabe .<cr>
+nnoremap f :Ex<CR>
+nnoremap F :Tex<cr>
 nnoremap t :tabnext<cr>
 nnoremap T :tabprev<cr>
 let g:netrw_banner = 0
@@ -42,18 +37,27 @@ let g:netrw_liststyle = 3
 let g:netrw_dirhistmax = 0
 let g:netrw_split_browse = 3
 
-if !has('gui_running')
-  set t_Co=256
-endif
-
-let g:lightline = { 'colorscheme': 'onedark' }
-
-if (has("autocmd") && !has("gui_running"))
-  augroup colorset
+if version >= 500
+  augroup LaunchNetrw
     autocmd!
-    let s:white = { "gui": "#ABB2BF", "cterm": "145", "cterm16" : "7" }
-    autocmd ColorScheme * call onedark#set_highlight("Normal", { "fg": s:white })
+    autocmd VimEnter * if !argc() | Explore | endif
   augroup END
+  augroup WhiteSpace
+    autocmd!
+    autocmd BufWritePre * %s/\s\+$//e
+  augroup END
+
+  if !has('gui_running')
+    set t_Co=256
+    augroup colorset
+      autocmd!
+      let s:white = { 'gui': '#ABB2BF', 'cterm': '145', 'cterm16' : '7' }
+      autocmd ColorScheme * call onedark#set_highlight('Normal', { 'fg': s:white })
+    augroup END
+  else
+    set guifont=Noto_mono:h15
+  endif
 endif
 
 colorscheme onedark
+let g:lightline = { 'colorscheme': 'onedark' }

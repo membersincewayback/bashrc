@@ -28,14 +28,12 @@ nnoremap S :%s//gc<Left><Left><Left>
 inoremap jj <Esc>
 nnoremap ,<space> :put! _<cr>
 nnoremap .<space> :put _<cr>
-nnoremap f :Ex<CR>
-nnoremap F :Tex<cr>
-nnoremap <TAB> :tabnext<cr>
-nnoremap <S-TAB> :tabprev<cr>
+nnoremap F :Ex<cr>
+nnoremap <TAB> :bn<cr>
+nnoremap <S-TAB> :bp<cr>
 let g:netrw_banner = 0
 let g:netrw_liststyle = 3
 let g:netrw_dirhistmax = 0
-let g:netrw_split_browse = 3
 
 if version >= 500
   augroup LaunchNetrw

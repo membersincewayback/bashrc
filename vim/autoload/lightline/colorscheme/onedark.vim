@@ -9,7 +9,6 @@ if get(g:, 'onedark_termcolors', 256) == 16
   let s:term_red = s:colors.red.cterm16
   let s:term_green = s:colors.green.cterm16
   let s:term_yellow = s:colors.yellow.cterm16
-  let s:term_yellow = s:colors.yellow.cterm16
   let s:term_blue = s:colors.blue.cterm16
   let s:term_purple = s:colors.purple.cterm16
   let s:term_white = s:colors.white.cterm16
@@ -19,7 +18,6 @@ else
   let s:term_red = s:colors.red.cterm
   let s:term_green = s:colors.green.cterm
   let s:term_yellow = s:colors.yellow.cterm
-  let s:term_dark_yellow = s:colors.dark_yellow.cterm
   let s:term_blue = s:colors.blue.cterm
   let s:term_purple = s:colors.purple.cterm
   let s:term_white = s:colors.white.cterm
@@ -29,7 +27,6 @@ endif
 
 let s:red = [ s:colors.red.gui, s:term_red ]
 let s:green = [ s:colors.green.gui, s:term_green ]
-let s:yellow = [ s:colors.yellow.gui, s:term_yellow ]
 let s:yellow = [ s:colors.yellow.gui, s:term_yellow ]
 let s:blue = [ s:colors.blue.gui, s:term_blue ]
 let s:purple = [ s:colors.purple.gui, s:term_purple ]

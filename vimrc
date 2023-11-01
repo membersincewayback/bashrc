@@ -1,4 +1,5 @@
 syntax on
+
 set smartindent
 set shiftwidth=4
 set smarttab
@@ -18,7 +19,7 @@ set scrolloff=8
 set wildmode=longest,list,full
 set colorcolumn=100
 set noshowmode
-if version >= 703 | set belloff=all | endif
+if exists('&belloff') | set belloff=all | endif
 
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
@@ -28,18 +29,22 @@ nnoremap S :%s//gc<Left><Left><Left>
 inoremap jj <Esc>
 nnoremap ,<space> :put! _<cr>
 nnoremap .<space> :put _<cr>
-nnoremap F :Ex<cr>
+nnoremap f :Ex<cr>
+nnoremap F :Tex<cr>
 nnoremap <TAB> :bn<cr>
 nnoremap <S-TAB> :bp<cr>
+
 let g:netrw_banner = 0
 let g:netrw_liststyle = 3
 let g:netrw_dirhistmax = 0
+let g:netrw_split_browser = 3
 
-if version >= 500
+if has('autocmd')
   augroup LaunchNetrw
     autocmd!
     autocmd VimEnter * if !argc() | Explore | endif
   augroup END
+
   augroup WhiteSpace
     autocmd!
     autocmd BufWritePre * %s/\s\+$//e

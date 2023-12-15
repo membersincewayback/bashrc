@@ -15,7 +15,7 @@ pd() {
 killbg() {
     local array confirm pid
 
-    readarray -t array < <( jobs -p )
+    readarray -t array < <(jobs -p)
     [[ -z "${array[*]}" ]] && { printf "killbg: no such job\n" >&2; return 1; }
     [[ -z "$1" ]] && {
         jobs -l
@@ -30,7 +30,7 @@ clean_history() {
     hist="${HOME}/.bash_history"
 
     if [[ -f "$hist" ]]; then
-        hist_tmp="$(tac "$hist" | awk '{$1=$1}1 && !x[$0]++' | tac )"
+        hist_tmp="$(tac "$hist" | awk '{$1=$1}1 && !x[$0]++' | tac)"
         echo "$hist_tmp" > "$hist"
     fi
 }
@@ -52,10 +52,22 @@ extract() {
     esac
 }
 
+compress() {
+    if [[ -z "$1" ]]; then
+        printf "compress: must provide file/directory path\n" 1>&2; return 1
+    elif [[ -d "$1" ]]; then
+        tar -czf "${1%/}.tar.gz" "$1";
+    elif [[ -f "$1" ]]; then
+        tar -czf "${1}.gz" "$1";
+    else
+        printf "compress: %s: invalid path\n" "$1" 1>&2; return 1
+    fi
+}
+
 checkmounts() {
     local mount
 
-    while IFS= read -r mount; do
+    while read -r mount; do
         if ! findmnt "$mount" &> /dev/null; then
             printf "\033[31m%s is declared in fstab but not mounted\n\033[0m" "$mount" >&2
         else
@@ -68,10 +80,10 @@ checkfs() {
     local mount
 
     timeout 2 df &> /dev/null || { printf "Hung mount detected.\n" >&2; return 1; }
-    while IFS= read -r mount; do
+    while read -r mount; do
         findmnt "$mount" &> /dev/null || {
         printf "%s is declared in fstab but not mounted\n" "$mount" >&2; }
-    done < <(awk '!~/^#/ && $2~/^[/]/ {print $2}' /etc/fstab)
+    done < <(awk '!/^#/ && $2~/^[/]/ {print $2}' /etc/fstab)
     printf "Full File Systems:\n%s\n" "$(df -h | grep "100%" || printf "None\n")"
     printf "Full Inodes:\n%s\n" "$(df -i | grep "100%" || printf "None\n")"
 }
@@ -79,8 +91,8 @@ checkfs() {
 thetime() {
     local zulu central
 
-    zulu="$( date -u +"%a %b %-d, %Y - %R:%S" )"
-    central="$( TZ="America/Chicago" date +"%a %b %-d, %Y - %R:%S" )"
+    zulu="$(date -u +"%a %b %-d, %Y - %R:%S")"
+    central="$(TZ="America/Chicago" date +"%a %b %-d, %Y - %R:%S")"
 
     printf "CDT: %s\nUTC: %s\n" "$central" "$zulu"
 }

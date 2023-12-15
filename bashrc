@@ -1,13 +1,15 @@
-if [[ "$-" != *i* ]]; then return; else printf '\033c'; fi
+[[ "$-" != *i* ]] && return || printf '\033[2J\033[H'
 
-[[ -f "/etc/bashrc" ]] && . "/etc/bashrc"
-[[ -f ${HOME}/.local/colors ]] && . "${HOME}/.local/colors"
-[[ -f ${HOME}/.local/functions ]] && . "${HOME}/.local/functions"
-[[ "$PATH" != *${HOME}/.local/bin:* ]] && export PATH="${HOME}/.local/bin:${PATH}"
+[[ -f /etc/bashrc ]] && . /etc/bashrc
+[[ -f "${HOME}/.local/colors" ]] && {
+    . "${HOME}/.local/colors"
+    PS1="${grey}\u${green} | ${grey}\h${green} | ${purple}\w${green}\n$ \[${reset}"; }
+[[ -f "${HOME}/.local/functions" ]] && . "${HOME}/.local/functions"
+[[ "$PATH" != *${HOME}/.local/bin* ]] && export PATH="${HOME}/.local/bin:${PATH}"
 
 stty -ixon
 
-clean_history
+type clean_history &> /dev/null && clean_history
 HISTSIZE=5000
 HISTFILESIZE=5000
 HISTCONTROL=ignoredups:erasedups
@@ -29,5 +31,3 @@ export EDITOR="$VISUAL"
 export PAGER="/usr/bin/less"
 export LESSHISTFILE="/dev/null"
 export PYTHONDONTWRITEBYTECODE=1
-
-PS1="\e[${grey}\u${green} | ${grey}\h${green} | ${purple}\w${green}\n$ \[${reset}"

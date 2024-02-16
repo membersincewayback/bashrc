@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-[[ -f ${HOME}/.local/colors ]] && . "${HOME}/.local/colors"
+[[ -f "${HOME}/.local/colors" ]] && . "${HOME}/.local/colors"
 
-today=$(date +%A)
+today="$(date +%A)"
 
 printf "\t   "
 printf "%b%b%bIT'S TACO %s!!!%b" ${blink} ${bold} ${green} ${today^^} ${reset}
@@ -33,7 +33,7 @@ printf "%b
 ⠀⠀⠀⣠⠖⠀⠀⡀⠀⠀⠀⠈⠁⠀⠀⠀⢳⠀⡠⠚⠉⢆⠀⢀⠜⠑⢄⠀⠀⡞⠈⠱⠾⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡀⠈⢦⡀⠀⠀⠀
 ⠀⠀⠈⠁⠀⣠⠎⠀⢀⡼⠁⢀⠀⠀⠀⠀⠘⠋⠀⠀⠀⠈⠷⠃⠀⠀⠀⠳⡼⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠀⢢⡀⠈⢷⡀⠈⠗⠀⠀⠀
 ⠀⠀⠀⠀⠈⠁⠀⠀⡻⠁⠀⠛⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠈⠃⠀⠈⠁⠀⠀⠀⠀⠀
-%b" ${yellow} ${reset}
+%b" "${yellow}" "${reset}"
 
 printf "\t   "
-printf "%b%b%bLET'S ALL GO GET TACOS!!!%b\n" ${blink} ${bold} ${green} ${reset}
+printf "%b%b%bLET'S ALL GO GET TACOS!!!%b\n" "${blink}" "${bold}" "${green}" "${reset}"

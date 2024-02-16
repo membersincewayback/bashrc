@@ -31,8 +31,8 @@ nnoremap ,<space> :put! _<cr>
 nnoremap .<space> :put _<cr>
 nnoremap f :Ex<cr>
 nnoremap F :Tex<cr>
-nnoremap <TAB> :bn<cr>
-nnoremap <S-TAB> :bp<cr>
+nnoremap <TAB> :tabnext<cr>
+nnoremap <S-TAB> :tabprev<cr>
 
 let g:netrw_banner = 0
 let g:netrw_liststyle = 3

@@ -30,3 +30,5 @@ export EDITOR="$VISUAL"
 export PAGER="/usr/bin/less"
 export LESSHISTFILE="/dev/null"
 export PYTHONDONTWRITEBYTECODE=1
+
+bind "set completion-ignore-case on"

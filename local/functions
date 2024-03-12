@@ -45,8 +45,8 @@ killbg() {
     [[ -z "${array[*]}" ]] && { printf "killbg: no such job\n" >&2; return 1; }
     [[ -z "$1" ]] && {
         jobs -l
-        read -erp "Kill: ${array[*]}? [y/n]: " confirm
-        [[ ! "${confirm,,}" =~ ^y(es)?$ ]] && return 0; }
+        read -erp "Kill: ${array[*]}? [y/N]: " confirm
+        [[ "${confirm,,}" =~ ^y(es)?$ ]] || return 0; }
     for pid in "${array[@]}"; do kill "${1:--15}" "$pid"; done
     sleep .1; jobs
 }

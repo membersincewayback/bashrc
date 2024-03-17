@@ -33,6 +33,7 @@ nnoremap f :Ex<cr>
 nnoremap F :Tex<cr>
 nnoremap <TAB> :tabnext<cr>
 nnoremap <S-TAB> :tabprev<cr>
+nnoremap <F2> :set number!<cr>
 
 let g:netrw_banner = 0
 let g:netrw_liststyle = 3

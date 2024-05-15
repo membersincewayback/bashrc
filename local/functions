@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 cidr() {
-    local input="${1#/}"
+    local cidr input
+    input="${1#/}"
 
     local -A cidr_dict=(
         [32]="255.255.255.255"  [31]="255.255.255.254"  [30]="255.255.255.252"
@@ -43,12 +44,12 @@ killbg() {
 
     readarray -t array < <(jobs -p)
     [[ -z "${array[*]}" ]] && { printf "killbg: no such job\n" >&2; return 1; }
-    [[ -z "$1" ]] && {
-        jobs -l
-        read -erp "Kill: ${array[*]}? [y/N]: " confirm
-        [[ "${confirm,,}" =~ ^y(es)?$ ]] || return 0; }
+    jobs -l
+    read -erp "Kill: ${array[*]}? [y/N]: " confirm
+    [[ "${confirm,,}" =~ ^y(es)?$ ]] || return 0
     for pid in "${array[@]}"; do kill "${1:--15}" "$pid"; done
-    sleep .1; jobs
+    sleep .1
+    jobs
 }
 
 clean_history() {
@@ -121,4 +122,24 @@ thetime() {
     central="$(TZ="America/Chicago" date +"%a %b %-d, %Y - %R:%S")"
 
     printf "CDT: %s\nUTC: %s\n" "$central" "$zulu"
+}
+
+merge_upstream() {
+    local main
+
+    if git rev-parse --git-dir > /dev/null; then
+        main="$(git remote show upstream | awk '/HEAD/{print $NF}')"
+        [[ -n "$main" ]] && { git fetch upstream && git merge "upstream/${main}" && git push; }
+    else
+        return 1
+    fi
+}
+
+reset_unstage() {
+    if git rev-parse --git-dir > /dev/null; then
+        git reset --soft HEAD~1
+        git reset HEAD -- .
+    else
+        return 1
+    fi
 }

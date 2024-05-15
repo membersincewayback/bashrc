@@ -6,7 +6,7 @@
     . "${HOME}/.local/colors"
     PS1="${grey}\u${green} | ${grey}\h${green} | ${purple}\w${green}\n$ \[${reset}"; }
 
-stty -ixon
+/usr/bin/stty -ixon
 
 type clean_history &> /dev/null && clean_history
 HISTSIZE=5000
@@ -22,8 +22,11 @@ alias me='ps -flu ${USER}'
 alias less='less -sRM'
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
-dmesg -V &> /dev/null && alias dmesg='dmesg -TL'
-type bat &> /dev/null && alias cat='bat -pp'
+/usr/bin/dmesg -V &> /dev/null && alias dmesg='dmesg -TL'
+
+if (command -v bat || command -v batcat) &> /dev/null; then
+    alias cat="$(command -v bat || command -v batcat) -p"
+fi
 
 export VISUAL="/usr/bin/vim"
 export EDITOR="$VISUAL"

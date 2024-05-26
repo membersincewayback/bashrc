@@ -4,9 +4,9 @@
 [[ "$PATH" =~ "${HOME}/.local/bin" ]] || export PATH="${HOME}/.local/bin:${PATH}"
 [[ -f "${HOME}/.local/colors" ]] && {
     . "${HOME}/.local/colors"
-    PS1="${grey}\u${green} | ${grey}\h${green} | ${purple}\w${green}\n$ \[${reset}"; }
+    PS1="${grey}\u${green} [${grey}\h${green}] ${purple}\w${green} >> \[${reset}"; }
 
-/usr/bin/stty -ixon
+stty -ixon
 
 type clean_history &> /dev/null && clean_history
 HISTSIZE=5000
@@ -22,7 +22,7 @@ alias me='ps -flu ${USER}'
 alias less='less -sRM'
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
-/usr/bin/dmesg -V &> /dev/null && alias dmesg='dmesg -TL'
+dmesg -V &> /dev/null && alias dmesg='dmesg -TL'
 
 if (command -v bat || command -v batcat) &> /dev/null; then
     alias cat="$(command -v bat || command -v batcat) -p"

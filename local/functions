@@ -1,5 +1,29 @@
 #!/usr/bin/env bash
 
+checkfs() {
+    local mount
+
+    timeout 2 df &> /dev/null || { printf "Hung mount detected.\n" >&2; return 1; }
+    while read -r mount; do
+        findmnt "$mount" &> /dev/null || {
+        printf "%s is declared in fstab but not mounted\n" "$mount" >&2; }
+    done < <(awk '!/^#/ && $2~/^[/]/ {print $2}' /etc/fstab)
+    printf "Full File Systems:\n%s\n" "$(df -h | grep "100%" || printf "None\n")"
+    printf "Full Inodes:\n%s\n" "$(df -i | grep "100%" || printf "None\n")"
+}
+
+checkmounts() {
+    local mount
+
+    while read -r mount; do
+        if ! findmnt "$mount" &> /dev/null; then
+            printf "\033[31m%s is declared in fstab but not mounted\n\033[0m" "$mount" >&2
+        else
+            printf "%s is mounted properly\n" "$mount"
+        fi
+    done < <(awk '!/^#/ && $2~/^[/]/ {print $2}' /etc/fstab)
+}
+
 cidr() {
     local cidr input
     input="${1#/}"
@@ -27,31 +51,6 @@ cidr() {
     printf "Enter CIDR notation ('/24') or subnet mask ('255.255.255.0')\n" >&2; return 1
 }
 
-pd() {
-    { case "$1" in
-        +[0-9]) pushd "$1" || return 1 ;;
-        -[0-9]) popd +"${1//[!0-9]/}" || return 1 ;;
-        -) popd || return 1 ;;
-        -c) dirs -c ;;
-        *) pushd "$@" || return 1 ;;
-    esac
-    } > /dev/null
-    dirs -v
-}
-
-killbg() {
-    local array confirm pid
-
-    readarray -t array < <(jobs -p)
-    [[ -z "${array[*]}" ]] && { printf "killbg: no such job\n" >&2; return 1; }
-    jobs -l
-    read -erp "Kill: ${array[*]}? [y/N]: " confirm
-    [[ "${confirm,,}" =~ ^y(es)?$ ]] || return 0
-    for pid in "${array[@]}"; do kill "${1:--15}" "$pid"; done
-    sleep .1
-    jobs
-}
-
 clean_history() {
     local hist hist_tmp
     hist="${HOME}/.bash_history"
@@ -60,6 +59,31 @@ clean_history() {
         hist_tmp="$(tac "$hist" | awk '{$1=$1}1 && !x[$0]++' | tac)"
         echo "$hist_tmp" > "$hist"
     fi
+}
+
+compress() {
+    if [[ -z "$1" ]]; then
+        printf "compress: must provide file/directory path\n" 1>&2; return 1
+    elif [[ -d "$1" ]]; then
+        tar -czf "${1%/}.tar.gz" "$1";
+    elif [[ -f "$1" ]]; then
+        tar -czf "${1}.gz" "$1";
+    else
+        printf "compress: %s: invalid path\n" "$1" 1>&2; return 1
+    fi
+}
+
+connect() {
+    if [[ -z "$1" ]]; then
+        printf "connect: must provide hostname\n" >&2; return 1
+    else
+        local host="$1"
+        local files=("${HOME}/.bashrc" "${HOME}/.bash_profile" "${HOME}/.vimrc" "${HOME}/.local" "${HOME}/.vim")
+    fi
+
+    rsync -ac "${files[@]}" "${host}:${HOME}"
+
+    ssh -qto ConnectTimeout=5 "$host"
 }
 
 extract() {
@@ -79,49 +103,34 @@ extract() {
     esac
 }
 
-compress() {
-    if [[ -z "$1" ]]; then
-        printf "compress: must provide file/directory path\n" 1>&2; return 1
-    elif [[ -d "$1" ]]; then
-        tar -czf "${1%/}.tar.gz" "$1";
-    elif [[ -f "$1" ]]; then
-        tar -czf "${1}.gz" "$1";
-    else
-        printf "compress: %s: invalid path\n" "$1" 1>&2; return 1
-    fi
-}
+killbg() {
+    local array confirm pid
 
-checkmounts() {
-    local mount
-
-    while read -r mount; do
-        if ! findmnt "$mount" &> /dev/null; then
-            printf "\033[31m%s is declared in fstab but not mounted\n\033[0m" "$mount" >&2
-        else
-            printf "%s is mounted properly\n" "$mount"
+    while read -r line; do
+        if [[ "$line" =~ (Stopped|Running) ]]; then
+            read -ra fields <<< "$line"
+            if [[ "${fields[0]}" =~ ^[0-9]+$ ]]; then
+                array+=("${fields[0]}")
+            else
+                array+=("${fields[1]}")
+            fi
         fi
-    done < <(awk '!/^#/ && $2~/^[/]/ {print $2}' /etc/fstab)
-}
+    done < <(jobs -l)
 
-checkfs() {
-    local mount
+    if [[ -z "${array[*]}" ]]; then
+        printf "killbg: no such job\n" >&2; return 1
+    fi
 
-    timeout 2 df &> /dev/null || { printf "Hung mount detected.\n" >&2; return 1; }
-    while read -r mount; do
-        findmnt "$mount" &> /dev/null || {
-        printf "%s is declared in fstab but not mounted\n" "$mount" >&2; }
-    done < <(awk '!/^#/ && $2~/^[/]/ {print $2}' /etc/fstab)
-    printf "Full File Systems:\n%s\n" "$(df -h | grep "100%" || printf "None\n")"
-    printf "Full Inodes:\n%s\n" "$(df -i | grep "100%" || printf "None\n")"
-}
+    jobs -l
+    read -erp "Kill PIDs: ${array[*]}? [y/N]: " confirm
+    [[ "${confirm,,}" =~ ^y(es)?$ ]] || return 0
 
-thetime() {
-    local zulu central
+    for pid in "${array[@]}"; do
+        kill "${1:--15}" "$pid"
+    done
 
-    zulu="$(date -u +"%a %b %-d, %Y - %R:%S")"
-    central="$(TZ="America/Chicago" date +"%a %b %-d, %Y - %R:%S")"
-
-    printf "CDT: %s\nUTC: %s\n" "$central" "$zulu"
+    sleep .1
+    jobs
 }
 
 merge_upstream() {
@@ -135,6 +144,18 @@ merge_upstream() {
     fi
 }
 
+pd() {
+    { case "$1" in
+        +[0-9]) pushd "$1" || return 1 ;;
+        -[0-9]) popd +"${1//[!0-9]/}" || return 1 ;;
+        -) popd || return 1 ;;
+        -c) dirs -c ;;
+        *) pushd "$@" || return 1 ;;
+    esac
+    } > /dev/null
+    dirs -v
+}
+
 reset_unstage() {
     if git rev-parse --git-dir > /dev/null; then
         git reset --soft HEAD~1
@@ -142,4 +163,13 @@ reset_unstage() {
     else
         return 1
     fi
+}
+
+thetime() {
+    local zulu central
+
+    zulu="$(date -u +"%a %b %-d, %Y - %R:%S")"
+    central="$(TZ="America/Chicago" date +"%a %b %-d, %Y - %R:%S")"
+
+    printf "CDT: %s\nUTC: %s\n" "$central" "$zulu"
 }

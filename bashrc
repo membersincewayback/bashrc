@@ -1,10 +1,11 @@
-[[ "$-" =~ i ]] && printf '\033[2J\033[H' || return
+if [[ "$-" == *i* ]]; then printf '\033[2J\033[H'; else return 0; fi
 
+[[ -f /etc/profile ]] && . /etc/profile
 [[ -f "${HOME}/.local/functions" ]] && . "${HOME}/.local/functions"
 [[ "$PATH" =~ "${HOME}/.local/bin" ]] || export PATH="${HOME}/.local/bin:${PATH}"
-[[ -f "${HOME}/.local/colors" ]] && {
-    . "${HOME}/.local/colors"
-    PS1="${grey}\u${green} [${grey}\h${green}] ${purple}\w${green} >> \[${reset}"; }
+[[ -f "${HOME}/.local/colors" ]] && . "${HOME}/.local/colors"
+
+PS1="\[\033[38;5;248m\]\u \[\033[38;5;119m\][\[\033[38;5;248m\]\h\[\033[38;5;119m\]] \[\033[38;5;129m\]\w \[\033[38;5;119m\]>> \[\033[0m\]"
 
 stty -ixon
 

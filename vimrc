@@ -1,4 +1,5 @@
 syntax on
+let mapleader = " "
 
 set smartindent
 set shiftwidth=4
@@ -11,7 +12,7 @@ set smartcase
 set incsearch
 set laststatus=2
 set number
-set timeoutlen=200 ttimeoutlen=0
+set timeoutlen=400 ttimeoutlen=0
 set noswapfile
 set pastetoggle=<F3>
 set cursorline
@@ -62,6 +63,13 @@ if has('autocmd')
     set guifont=Noto_mono:h15
   endif
 endif
+
+function! SudoWrite()
+  silent! execute 'w !sudo tee % > /dev/null'
+  edit!
+endfunction
+
+nnoremap <Leader>W :call SudoWrite()<CR>
 
 colorscheme onedark
 let g:lightline = { 'colorscheme': 'onedark' }
